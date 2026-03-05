@@ -473,7 +473,7 @@ class Guilamu_Plugins {
 			// 2. Is in our known GF_SLUGS fallback, OR
 			// 3. Is already installed locally as a WP plugin.
 			$topics       = isset( $repo['topics'] ) ? $repo['topics'] : array();
-			$has_wp_topic = in_array( 'wordpress-plugin', $topics, true );
+			$has_wp_topic = in_array( 'wordpress-plugin', $topics, true ) || in_array( 'wordpress', $topics, true );
 			$is_known     = in_array( $slug, self::GF_SLUGS, true );
 			$installed    = $this->find_installed_plugin( $slug, $installed_plugins );
 
