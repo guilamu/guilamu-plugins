@@ -50,8 +50,13 @@
 }
 
 @keyframes guilamu-spin {
-	from { transform: rotate(0deg); }
-	to   { transform: rotate(360deg); }
+	from {
+		transform: rotate(0deg);
+	}
+
+	to {
+		transform: rotate(360deg);
+	}
 }
 
 /* ── Notices ── */
@@ -201,35 +206,41 @@
 	flex-shrink: 0;
 }
 
-.guilamu-github-link {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	color: #50575e;
-	text-decoration: none;
-	padding: 4px;
-	border-radius: 3px;
-	transition: color 0.15s, background 0.15s;
-}
-
-.guilamu-github-link:hover {
-	color: #1d2327;
-	background: #f0f0f1;
-}
-
-/* Header Icon Buttons (bug, delete) */
-
+.guilamu-github-link,
 .guilamu-header-icon-btn {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	background: none;
-	border: none;
+	background: #fff;
+	border: 1px solid #dcdde5 !important;
 	color: #50575e;
 	padding: 4px;
+	width: 28px;
+	height: 28px;
+	box-sizing: border-box;
 	border-radius: 3px;
 	cursor: pointer;
-	transition: color 0.15s, background 0.15s;
+	box-shadow: 0 1px 2px rgba(18, 21, 38, 0.08) !important;
+	transition: all 0.15s ease-in-out !important;
+	text-decoration: none;
+}
+
+.guilamu-github-link:hover,
+.guilamu-header-icon-btn:hover {
+	color: #1d2327;
+	background: #fff;
+	border-color: #c3c5db !important;
+	transform: translateY(-1px) !important;
+	box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15) !important;
+}
+
+.guilamu-github-link:active,
+.guilamu-header-icon-btn:active,
+.guilamu-github-link:focus,
+.guilamu-header-icon-btn:focus {
+	transform: translateY(1px) !important;
+	box-shadow: none !important;
+	border-color: #dcdde5 !important;
 }
 
 .guilamu-header-icon-btn .dashicons {
@@ -239,14 +250,9 @@
 	line-height: 16px;
 }
 
-.guilamu-header-icon-btn.guilamu-bug-report-btn:hover {
-	color: #dba617;
-	background: #fcf0e3;
-}
-
 .guilamu-header-icon-btn.guilamu-delete-btn:hover {
 	color: #b32d2e;
-	background: #fcf0f1;
+	border-color: #fca2a2 !important;
 }
 
 /* Card Body */
