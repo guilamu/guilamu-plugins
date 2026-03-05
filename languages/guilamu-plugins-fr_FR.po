@@ -1,0 +1,152 @@
+# French translation for Guilamu's WordPress Plugins
+# Copyright (C) 2026 Guilamu
+# This file is distributed under the same license as the Guilamu's WordPress Plugins package.
+# Guilamu <guilamu@github.com>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Guilamu's WordPress Plugins 1.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/guilamu/guilamu-plugins/issues\n"
+"POT-Creation-Date: 2026-03-05T00:00:00+00:00\n"
+"PO-Revision-Date: 2026-03-05T00:00:00+00:00\n"
+"Last-Translator: Guilamu <guilamu@github.com>\n"
+"Language-Team: French <fr@li.org>\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Manual\n"
+"X-Domain: guilamu-plugins\n"
+
+#. Plugin Name of the plugin
+msgid "Guilamu's WordPress Plugins"
+msgstr "Extensions WordPress de Guilamu"
+
+#. Plugin URI of the plugin
+msgid "https://github.com/guilamu/guilamu-plugins"
+msgstr "https://github.com/guilamu/guilamu-plugins"
+
+#. Description of the plugin
+msgid "Easily discover, install, and manage Guilamu's WordPress plugins directly from your admin dashboard."
+msgstr "Découvrez, installez et gérez facilement les extensions WordPress de Guilamu directement depuis votre tableau de bord."
+
+#. Author of the plugin
+msgid "Guilamu"
+msgstr "Guilamu"
+
+#: includes/class-guilamu-plugins.php
+msgid "Refresh plugin list from GitHub"
+msgstr "Actualiser la liste des extensions depuis GitHub"
+
+#: includes/class-guilamu-plugins.php
+msgid "Refresh"
+msgstr "Actualiser"
+
+#: includes/class-guilamu-plugins.php
+msgid "Could not fetch plugin data from GitHub. Descriptions may be unavailable. Click \"Refresh\" to retry."
+msgstr "Impossible de récupérer les données depuis GitHub. Les descriptions peuvent être indisponibles. Cliquez sur « Actualiser » pour réessayer."
+
+#: includes/class-guilamu-plugins.php
+msgid "Gravity Forms is not installed or activated. Gravity Forms plugins require it to function."
+msgstr "Gravity Forms n'est pas installé ou activé. Les extensions Gravity Forms nécessitent son activation pour fonctionner."
+
+#: includes/class-guilamu-plugins.php
+msgid "Search plugins..."
+msgstr "Rechercher des extensions…"
+
+#: includes/class-guilamu-plugins.php
+msgid "All Plugins"
+msgstr "Toutes les extensions"
+
+#: includes/class-guilamu-plugins.php
+msgid "Activated"
+msgstr "Activées"
+
+#: includes/class-guilamu-plugins.php
+msgid "Installed"
+msgstr "Installées"
+
+#: includes/class-guilamu-plugins.php
+msgid "Not Installed"
+msgstr "Non installées"
+
+#: includes/class-guilamu-plugins.php
+msgid "All Categories"
+msgstr "Toutes les catégories"
+
+#: includes/class-guilamu-plugins.php
+msgid "Gravity Forms"
+msgstr "Gravity Forms"
+
+#: includes/class-guilamu-plugins.php
+msgid "Non-Gravity Forms"
+msgstr "Autres extensions"
+
+#: includes/class-guilamu-plugins.php
+msgid "View on GitHub"
+msgstr "Voir sur GitHub"
+
+#: includes/class-guilamu-plugins.php
+msgid "Report a Bug"
+msgstr "Signaler un bug"
+
+#: includes/class-guilamu-plugins.php
+msgid "Delete plugin"
+msgstr "Supprimer l'extension"
+
+#: includes/class-guilamu-plugins.php
+msgid "Requires Gravity Forms"
+msgstr "Nécessite Gravity Forms"
+
+#: includes/class-guilamu-plugins.php
+msgid "General"
+msgstr "Général"
+
+#: includes/class-guilamu-plugins.php
+msgid "Install"
+msgstr "Installer"
+
+#: includes/class-guilamu-plugins.php
+msgid "Active"
+msgstr "Active"
+
+#: includes/class-guilamu-plugins.php
+msgid "Inactive"
+msgstr "Inactive"
+
+#: includes/class-guilamu-plugins.php
+msgid "Activate"
+msgstr "Activer"
+
+#: includes/class-guilamu-plugins.php
+msgid "Deactivate"
+msgstr "Désactiver"
+
+#: includes/class-guilamu-plugins.php
+msgid "No plugins match your criteria."
+msgstr "Aucune extension ne correspond à vos critères."
+
+#: includes/class-guilamu-plugins.php
+msgid "Permission denied."
+msgstr "Permission refusée."
+
+#: includes/class-guilamu-plugins.php
+msgid "Unknown plugin."
+msgstr "Extension inconnue."
+
+#: includes/class-guilamu-plugins.php
+msgid "Installation failed."
+msgstr "L'installation a échoué."
+
+#: includes/class-guilamu-plugins.php
+msgid "Plugin installed but main file not found."
+msgstr "Extension installée mais fichier principal introuvable."
+
+#: includes/class-guilamu-plugins.php
+msgid "Plugin file not found."
+msgstr "Fichier d'extension introuvable."
+
+#: includes/class-github-updater.php
+msgid "Unable to rename the update folder. Please retry or update manually."
+msgstr "Impossible de renommer le dossier de mise à jour. Veuillez réessayer ou effectuer la mise à jour manuellement."

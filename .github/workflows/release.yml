@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create plugin zip
+        run: |
+          mkdir -p build/guilamu-plugins
+
+          rsync -av \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='build' \
+            --exclude='.gitignore' \
+            --exclude='composer.*' \
+            --exclude='package*.json' \
+            --exclude='node_modules' \
+            --exclude='.DS_Store' \
+            --exclude='screenshot*.*' \
+            --exclude='*.Reference.md' \
+            ./ build/guilamu-plugins/
+
+          cp README.md build/guilamu-plugins/ 2>/dev/null || true
+
+          cd build
+          zip -r ../guilamu-plugins.zip guilamu-plugins
+          cd ..
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: guilamu-plugins.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

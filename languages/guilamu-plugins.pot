@@ -1,0 +1,151 @@
+# Copyright (C) 2026 Guilamu
+# This file is distributed under the same license as the Guilamu's WordPress Plugins package.
+# Guilamu <guilamu@github.com>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Guilamu's WordPress Plugins 1.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/guilamu/guilamu-plugins/issues\n"
+"POT-Creation-Date: 2026-03-05T00:00:00+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"X-Generator: \n"
+"X-Domain: guilamu-plugins\n"
+
+#. Plugin Name of the plugin
+msgid "Guilamu's WordPress Plugins"
+msgstr ""
+
+#. Plugin URI of the plugin
+msgid "https://github.com/guilamu/guilamu-plugins"
+msgstr ""
+
+#. Description of the plugin
+msgid "Easily discover, install, and manage Guilamu's WordPress plugins directly from your admin dashboard."
+msgstr ""
+
+#. Author of the plugin
+msgid "Guilamu"
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Refresh plugin list from GitHub"
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Refresh"
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Could not fetch plugin data from GitHub. Descriptions may be unavailable. Click \"Refresh\" to retry."
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Gravity Forms is not installed or activated. Gravity Forms plugins require it to function."
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Search plugins..."
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "All Plugins"
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Activated"
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Installed"
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Not Installed"
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "All Categories"
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Gravity Forms"
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Non-Gravity Forms"
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "View on GitHub"
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Report a Bug"
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Delete plugin"
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Requires Gravity Forms"
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "General"
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Install"
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Active"
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Inactive"
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Activate"
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Deactivate"
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "No plugins match your criteria."
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Permission denied."
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Unknown plugin."
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Installation failed."
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Plugin installed but main file not found."
+msgstr ""
+
+#: includes/class-guilamu-plugins.php
+msgid "Plugin file not found."
+msgstr ""
+
+#: includes/class-github-updater.php
+msgid "Unable to rename the update folder. Please retry or update manually."
+msgstr ""
