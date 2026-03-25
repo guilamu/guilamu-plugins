@@ -5,26 +5,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Guilamu_Plugins {
 
-	/**
-	 * GitHub repos that are WordPress plugins.
-	 * Add a 'wordpress-plugin' topic to any new GitHub repo to auto-include it.
-	 * The 'gravity-forms' topic marks it as a Gravity Forms plugin.
-	 *
-	 * This map serves as a fallback for category detection when topics aren't set.
-	 */
-	const GF_SLUGS = array(
-		'gf-advanced-expiring-entries',
-		'french-schools-map',
-		'gf-french-schools',
-		'gf-chained-select-enhancer',
-		'gravity-extract',
-		'gf-external-choices',
-		'GF-Advanced-Conditional-Choices',
-		'gf-merge-tag-autocomplete',
-		'gf-conditional-compass',
-		'gravity-forms-shortcode-builder',
-	);
-
 	private static $instance = null;
 
 	/** @var bool Whether the GitHub API returned data. */
@@ -470,22 +450,17 @@ class Guilamu_Plugins {
 
 			// Auto-detect if this is a WP plugin:
 			// 1. Has 'wordpress-plugin' topic, OR
-			// 2. Is in our known GF_SLUGS fallback, OR
-			// 3. Is already installed locally as a WP plugin.
+			// 2. Is already installed locally as a WP plugin.
 			$topics       = isset( $repo['topics'] ) ? $repo['topics'] : array();
 			$has_wp_topic = in_array( 'wordpress-plugin', $topics, true ) || in_array( 'wordpress', $topics, true );
-			$is_known     = in_array( $slug, self::GF_SLUGS, true );
 			$installed    = $this->find_installed_plugin( $slug, $installed_plugins );
 
-			if ( ! $has_wp_topic && ! $is_known && ! $installed ) {
+			if ( ! $has_wp_topic && ! $installed ) {
 				continue;
 			}
 
-			// Determine category.
-			$category = 'non-gravity-forms';
-			if ( in_array( $slug, self::GF_SLUGS, true ) || in_array( 'gravity-forms', $topics, true ) ) {
-				$category = 'gravity-forms';
-			}
+			// Determine category from GitHub topics.
+			$category = in_array( 'gravity-forms', $topics, true ) ? 'gravity-forms' : 'non-gravity-forms';
 
 			$plugin = array(
 				'slug'         => $slug,

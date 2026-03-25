@@ -3,7 +3,7 @@
  * Plugin Name: Guilamu's WordPress Plugins
  * Plugin URI: https://github.com/guilamu/guilamu-plugins
  * Description: Easily discover, install, and manage Guilamu's WordPress plugins directly from your admin dashboard.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Guilamu
  * Author URI: https://github.com/guilamu
  * Text Domain: guilamu-plugins
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'GUILAMU_PLUGINS_VERSION', '1.0.0' );
+define( 'GUILAMU_PLUGINS_VERSION', '1.0.1' );
 define( 'GUILAMU_PLUGINS_FILE', __FILE__ );
 define( 'GUILAMU_PLUGINS_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GUILAMU_PLUGINS_URL', plugin_dir_url( __FILE__ ) );

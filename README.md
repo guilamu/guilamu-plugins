@@ -91,6 +91,9 @@ The dashboard falls back gracefully if the GitHub API is unreachable — already
 
 ## Changelog
 
+### 1.0.1
+- Removed hardcoded GF_SLUGS fallback list; plugin category badges now rely entirely on GitHub repository topics (`gravity-forms`, `wordpress-plugin`)
+
 ### 1.0.0
 - Initial release
 - Plugin dashboard with card grid, search, and dropdown filters
