@@ -282,16 +282,45 @@ class Guilamu_Plugins {
 			wp_send_json_error( array( 'message' => __( 'Unknown plugin.', 'guilamu-plugins' ) ) );
 		}
 
-		$download_url = 'https://github.com/guilamu/' . rawurlencode( $slug ) . '/releases/latest/download/' . rawurlencode( $slug ) . '.zip';
+		$download_url = $this->get_download_url( $slug );
+
+		if ( ! $download_url ) {
+			wp_send_json_error( array( 'message' => __( 'No downloadable package found for this plugin.', 'guilamu-plugins' ) ) );
+		}
 
 		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 		require_once ABSPATH . 'wp-admin/includes/misc.php';
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
+		// Allow GitHub redirect hosts so wp_safe_remote_get() does not block the download.
+		$allow_github_hosts = function ( $external, $host ) {
+			if ( 'objects.githubusercontent.com' === $host || 'github-releases.githubusercontent.com' === $host || 'codeload.github.com' === $host ) {
+				return true;
+			}
+			return $external;
+		};
+		add_filter( 'http_request_host_is_external', $allow_github_hosts, 10, 2 );
+
+		// Rename the extracted directory to the expected slug (source archives
+		// extract to "{slug}-{branch}" which would mismatch later lookups).
+		$rename_source = function ( $source, $remote_source, $upgrader_instance ) use ( $slug ) {
+			$corrected = trailingslashit( $remote_source ) . $slug . '/';
+			if ( $source !== $corrected && is_dir( $source ) ) {
+				if ( @rename( untrailingslashit( $source ), untrailingslashit( $corrected ) ) ) {
+					return $corrected;
+				}
+			}
+			return $source;
+		};
+		add_filter( 'upgrader_source_selection', $rename_source, 10, 3 );
+
 		$skin     = new WP_Ajax_Upgrader_Skin();
 		$upgrader = new Plugin_Upgrader( $skin );
 		$result   = $upgrader->install( $download_url );
+
+		remove_filter( 'http_request_host_is_external', $allow_github_hosts );
+		remove_filter( 'upgrader_source_selection', $rename_source );
 
 		if ( is_wp_error( $result ) ) {
 			wp_send_json_error( array( 'message' => $result->get_error_message() ) );
@@ -345,7 +374,16 @@ class Guilamu_Plugins {
 			wp_send_json_error( array( 'message' => __( 'Plugin file not found.', 'guilamu-plugins' ) ) );
 		}
 
-		$result = activate_plugin( $plugin_file );
+		// Validate the plugin file before activation to catch parse errors.
+		$valid = validate_plugin( $plugin_file );
+		if ( is_wp_error( $valid ) ) {
+			wp_send_json_error( array( 'message' => $valid->get_error_message() ) );
+		}
+
+		// Silent activation: mark the plugin as active without including it now.
+		// The plugin will be loaded on the next full page request, avoiding
+		// fatal errors or "cannot redeclare" issues during AJAX.
+		$result = activate_plugin( $plugin_file, '', false, true );
 
 		if ( is_wp_error( $result ) ) {
 			wp_send_json_error( array( 'message' => $result->get_error_message() ) );
@@ -510,6 +548,37 @@ class Guilamu_Plugins {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Resolve the best download URL for a plugin.
+	 *
+	 * Tries the GitHub Releases asset first; falls back to the source archive.
+	 *
+	 * @param string $slug Repository slug.
+	 * @return string|false Download URL or false on failure.
+	 */
+	private function get_download_url( $slug ) {
+		$encoded = rawurlencode( $slug );
+
+		// 1. Try GitHub Release asset.
+		$release_url   = 'https://github.com/guilamu/' . $encoded . '/releases/latest/download/' . $encoded . '.zip';
+		$head_response = wp_remote_head( $release_url, array(
+			'timeout'     => 10,
+			'redirection' => 5,
+			'headers'     => array( 'User-Agent' => 'Guilamu-Plugins-WordPress' ),
+		) );
+
+		if ( ! is_wp_error( $head_response ) && 200 === (int) wp_remote_retrieve_response_code( $head_response ) ) {
+			return $release_url;
+		}
+
+		// 2. Fall back to source code archive (always exists for public repos).
+		$api    = new Guilamu_GitHub_API();
+		$repos  = $api->get_repos();
+		$branch = isset( $repos[ $slug ]['default_branch'] ) ? $repos[ $slug ]['default_branch'] : 'main';
+
+		return 'https://github.com/guilamu/' . $encoded . '/archive/refs/heads/' . rawurlencode( $branch ) . '.zip';
 	}
 
 	/**

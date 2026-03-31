@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Guilamu's WordPress Plugins 1.0.0\n"
+"Project-Id-Version: Guilamu's WordPress Plugins 1.0.2\n"
 "Report-Msgid-Bugs-To: https://github.com/guilamu/guilamu-plugins/issues\n"
 "POT-Creation-Date: 2026-03-05T00:00:00+00:00\n"
 "MIME-Version: 1.0\n"
@@ -148,4 +148,12 @@ msgstr ""
 
 #: includes/class-github-updater.php
 msgid "Unable to rename the update folder. Please retry or update manually."
+msgstr ""
+
+#: guilamu-plugins.php
+msgid "More information about Guilamu's WordPress Plugins"
+msgstr ""
+
+#: guilamu-plugins.php
+msgid "View details"
 msgstr ""

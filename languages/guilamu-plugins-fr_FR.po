@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Guilamu's WordPress Plugins 1.0.0\n"
+"Project-Id-Version: Guilamu's WordPress Plugins 1.0.2\n"
 "Report-Msgid-Bugs-To: https://github.com/guilamu/guilamu-plugins/issues\n"
 "POT-Creation-Date: 2026-03-05T00:00:00+00:00\n"
-"PO-Revision-Date: 2026-03-05T00:00:00+00:00\n"
+"PO-Revision-Date: 2026-03-31 10:03+0200\n"
 "Last-Translator: Guilamu <guilamu@github.com>\n"
 "Language-Team: French <fr@li.org>\n"
 "Language: fr_FR\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Manual\n"
+"X-Generator: Poedit 3.8\n"
 "X-Domain: guilamu-plugins\n"
 
 #. Plugin Name of the plugin
@@ -150,3 +150,11 @@ msgstr "Fichier d'extension introuvable."
 #: includes/class-github-updater.php
 msgid "Unable to rename the update folder. Please retry or update manually."
 msgstr "Impossible de renommer le dossier de mise à jour. Veuillez réessayer ou effectuer la mise à jour manuellement."
+
+#: guilamu-plugins.php
+msgid "More information about Guilamu's WordPress Plugins"
+msgstr "Plus d'informations sur les extensions WordPress de Guilamu"
+
+#: guilamu-plugins.php
+msgid "View details"
+msgstr "Voir les détails"

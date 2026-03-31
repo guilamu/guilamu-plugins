@@ -91,6 +91,13 @@ The dashboard falls back gracefully if the GitHub API is unreachable — already
 
 ## Changelog
 
+### 1.0.2
+- Added "View details" thickbox link on the Plugins page
+- Rewritten GitHub updater: README.md-based plugin info popup with Description, Installation, FAQ, and Changelog tabs
+- Added Parsedown dependency for reliable Markdown-to-HTML conversion
+- CSS injection and div-based table rendering for wp_kses compatibility
+- Added required `id`, `slug`, `plugin` fields to update response for WP core compatibility
+
 ### 1.0.1
 - Removed hardcoded GF_SLUGS fallback list; plugin category badges now rely entirely on GitHub repository topics (`gravity-forms`, `wordpress-plugin`)
 

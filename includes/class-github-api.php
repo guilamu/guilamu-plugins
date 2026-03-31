@@ -72,11 +72,12 @@ class Guilamu_GitHub_API {
 		foreach ( $data as $repo ) {
 			if ( ! empty( $repo['name'] ) && empty( $repo['fork'] ) ) {
 				$repos[ $repo['name'] ] = array(
-					'name'        => $repo['name'],
-					'description' => isset( $repo['description'] ) ? $repo['description'] : '',
-					'html_url'    => isset( $repo['html_url'] ) ? $repo['html_url'] : '',
-					'updated_at'  => isset( $repo['updated_at'] ) ? $repo['updated_at'] : '',
-					'topics'      => isset( $repo['topics'] ) ? $repo['topics'] : array(),
+					'name'           => $repo['name'],
+					'description'    => isset( $repo['description'] ) ? $repo['description'] : '',
+					'html_url'       => isset( $repo['html_url'] ) ? $repo['html_url'] : '',
+					'updated_at'     => isset( $repo['updated_at'] ) ? $repo['updated_at'] : '',
+					'topics'         => isset( $repo['topics'] ) ? $repo['topics'] : array(),
+					'default_branch' => isset( $repo['default_branch'] ) ? $repo['default_branch'] : 'main',
 				);
 			}
 		}

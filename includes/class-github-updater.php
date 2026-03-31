@@ -85,6 +85,7 @@ class Guilamu_Plugins_GitHub_Updater {
 		add_filter( 'update_plugins_github.com', array( self::class, 'check_for_update' ), 10, 4 );
 		add_filter( 'plugins_api', array( self::class, 'plugin_info' ), 20, 3 );
 		add_filter( 'upgrader_source_selection', array( self::class, 'fix_folder_name' ), 10, 4 );
+		add_action( 'admin_head', array( self::class, 'plugin_info_css' ) );
 	}
 
 	/**
@@ -204,19 +205,26 @@ class Guilamu_Plugins_GitHub_Updater {
 		}
 
 		return array(
-			'version'      => $new_version,
-			'package'      => self::get_package_url( $release ),
-			'url'          => $release['html_url'],
-			'tested'       => self::TESTED_WP,
-			'requires_php' => self::REQUIRES_PHP,
+			'id'            => 'github.com/' . self::GITHUB_USER . '/' . self::GITHUB_REPO,
+			'slug'          => self::PLUGIN_SLUG,
+			'plugin'        => self::PLUGIN_FILE,
+			'new_version'   => $new_version,
+			'version'       => $new_version,
+			'package'       => self::get_package_url( $release ),
+			'url'           => $release['html_url'],
+			'tested'        => get_bloginfo( 'version' ),
+			'requires_php'  => self::REQUIRES_PHP,
 			'compatibility' => new stdClass(),
-			'icons'        => array(),
-			'banners'      => array(),
+			'icons'         => array(),
+			'banners'       => array(),
 		);
 	}
 
 	/**
 	 * Provide plugin details for the WordPress plugin information popup.
+	 *
+	 * Reads sections (description, installation, FAQ, changelog) from the
+	 * local README.md instead of fetching from the GitHub release body.
 	 *
 	 * @param false|object|array $res    Existing result.
 	 * @param string             $action API action.
@@ -232,59 +240,207 @@ class Guilamu_Plugins_GitHub_Updater {
 			return $res;
 		}
 
-		$release = self::get_release_data();
+		$plugin_file = WP_PLUGIN_DIR . '/' . self::PLUGIN_FILE;
+		$plugin_data = get_plugin_data( $plugin_file, false, false );
+		$release     = self::get_release_data();
 
-		// Even if GitHub is unavailable, return our own object to prevent
-		// WordPress.org API fallback which would show "Plugin not found".
-		if ( null === $release ) {
-			$plugin_data    = get_plugin_data( WP_PLUGIN_DIR . '/' . self::PLUGIN_FILE, false, false );
-			$current_version = $plugin_data['Version'] ?? '1.0.0';
+		$version = $release
+			? ltrim( $release['tag_name'], 'v' )
+			: ( $plugin_data['Version'] ?? '1.0.0' );
 
-			$res                    = new stdClass();
-			$res->name              = self::PLUGIN_NAME;
-			$res->slug              = self::PLUGIN_SLUG;
-			$res->version           = $current_version;
-			$res->author            = sprintf( '<a href="https://github.com/%s">%s</a>', self::GITHUB_USER, self::GITHUB_USER );
-			$res->homepage          = sprintf( 'https://github.com/%s/%s', self::GITHUB_USER, self::GITHUB_REPO );
-			$res->requires          = self::REQUIRES_WP;
-			$res->tested            = self::TESTED_WP;
-			$res->requires_php      = self::REQUIRES_PHP;
-			$res->sections          = array(
-				'description' => self::PLUGIN_DESCRIPTION,
-				'changelog'   => sprintf(
-					'<p>Unable to fetch changelog from GitHub. Visit <a href="https://github.com/%s/%s/releases" target="_blank">GitHub releases</a> for the latest information.</p>',
-					self::GITHUB_USER,
-					self::GITHUB_REPO
-				),
-			);
-			return $res;
+		$res               = new stdClass();
+		$res->name         = self::PLUGIN_NAME;
+		$res->slug         = self::PLUGIN_SLUG;
+		$res->plugin       = self::PLUGIN_FILE;
+		$res->version      = $version;
+		$res->author       = sprintf( '<a href="https://github.com/%s">%s</a>', self::GITHUB_USER, self::GITHUB_USER );
+		$res->homepage     = sprintf( 'https://github.com/%s/%s', self::GITHUB_USER, self::GITHUB_REPO );
+		$res->requires     = self::REQUIRES_WP;
+		$res->tested       = get_bloginfo( 'version' );
+		$res->requires_php = self::REQUIRES_PHP;
+
+		if ( $release ) {
+			$res->download_link = self::get_package_url( $release );
+			$res->last_updated  = $release['published_at'] ?? '';
 		}
 
-		$new_version = ltrim( $release['tag_name'], 'v' );
+		// Build sections from local README.md.
+		$readme = self::parse_readme();
 
-		$res                    = new stdClass();
-		$res->name              = self::PLUGIN_NAME;
-		$res->slug              = self::PLUGIN_SLUG;
-		$res->version           = $new_version;
-		$res->author            = sprintf( '<a href="https://github.com/%s">%s</a>', self::GITHUB_USER, self::GITHUB_USER );
-		$res->homepage          = sprintf( 'https://github.com/%s/%s', self::GITHUB_USER, self::GITHUB_REPO );
-		$res->download_link     = self::get_package_url( $release );
-		$res->requires          = self::REQUIRES_WP;
-		$res->tested            = self::TESTED_WP;
-		$res->requires_php      = self::REQUIRES_PHP;
-		$res->last_updated      = $release['published_at'] ?? '';
-		$res->sections          = array(
-			'description' => self::PLUGIN_DESCRIPTION,
-			'changelog'   => ! empty( $release['body'] )
-				? nl2br( esc_html( $release['body'] ) )
-				: sprintf(
-					'See <a href="https://github.com/%s/%s/releases" target="_blank">GitHub releases</a> for the changelog.',
-					self::GITHUB_USER,
-					self::GITHUB_REPO
-				),
+		$res->sections = array(
+			'description' => ! empty( $readme['description'] )
+				? $readme['description']
+				: '<p>' . esc_html( self::PLUGIN_DESCRIPTION ) . '</p>',
 		);
 
+		if ( ! empty( $readme['installation'] ) ) {
+			$res->sections['installation'] = $readme['installation'];
+		}
+
+		if ( ! empty( $readme['faq'] ) ) {
+			$res->sections['faq'] = $readme['faq'];
+		}
+
+		$res->sections['changelog'] = ! empty( $readme['changelog'] )
+			? $readme['changelog']
+			: sprintf(
+				'<p>See <a href="https://github.com/%s/%s/releases" target="_blank">GitHub releases</a> for changelog.</p>',
+				esc_attr( self::GITHUB_USER ),
+				esc_attr( self::GITHUB_REPO )
+			);
+
 		return $res;
+	}
+
+	/**
+	 * Inject CSS overrides inside the plugin-information iframe.
+	 *
+	 * wp_kses_post() strips <style> tags from section content, so CSS must be
+	 * injected via admin_head which fires inside the iframe's <head>.
+	 */
+	public static function plugin_info_css(): void {
+		if ( ! isset( $_GET['plugin'], $_GET['tab'] ) ) {
+			return;
+		}
+		if ( 'plugin-information' !== sanitize_text_field( wp_unslash( $_GET['tab'] ) )
+			|| self::PLUGIN_SLUG !== sanitize_text_field( wp_unslash( $_GET['plugin'] ) ) ) {
+			return;
+		}
+
+		echo '<style>'
+			. '#section-holder .section h2 { margin: 1.5em 0 0.5em; clear: none; }'
+			. '#section-holder .section h3 { margin: 1.5em 0 0.5em; }'
+			. '#section-holder .section > :first-child { margin-top: 0; }'
+			. '.md-table { display: table; width: 100%; border-collapse: collapse; margin: 1em 0; font-size: 13px; }'
+			. '.md-tr { display: table-row; }'
+			. '.md-tr > span { display: table-cell; padding: 6px 10px; border: 1px solid #ddd; vertical-align: top; }'
+			. '.md-th > span { font-weight: 600; background: #f5f5f5; }'
+			. '</style>';
+	}
+
+	// ------------------------------------------------------------------
+	// README.md parsing
+	// ------------------------------------------------------------------
+
+	/**
+	 * Parse the local README.md into description, installation, FAQ and changelog HTML.
+	 *
+	 * @return array{description: string, installation: string, faq: string, changelog: string}
+	 */
+	private static function parse_readme(): array {
+		$readme_path = WP_PLUGIN_DIR . '/' . dirname( self::PLUGIN_FILE ) . '/README.md';
+
+		if ( ! file_exists( $readme_path ) ) {
+			return array();
+		}
+
+		$content = file_get_contents( $readme_path );
+		if ( false === $content ) {
+			return array();
+		}
+
+		// Remove the main title line (# Title).
+		$content = preg_replace( '/^#\s+[^\n]+\n*/m', '', $content, 1 );
+
+		// Sections that are NOT part of the description tab.
+		$utility_sections = array(
+			'changelog', 'requirements', 'installation', 'faq',
+			'project structure', 'acknowledgements', 'license',
+		);
+
+		// Split content by ## headers.
+		$parts = preg_split( '/^##\s+/m', $content );
+
+		$description  = trim( $parts[0] ?? '' );
+		$installation = '';
+		$faq          = '';
+		$changelog    = '';
+
+		for ( $i = 1, $count = count( $parts ); $i < $count; $i++ ) {
+			$lines = explode( "\n", $parts[ $i ], 2 );
+			$title = strtolower( trim( $lines[0] ) );
+			$body  = trim( $lines[1] ?? '' );
+
+			if ( 'installation' === $title ) {
+				$installation .= $body . "\n\n";
+			} elseif ( 'faq' === $title ) {
+				$faq .= $body . "\n\n";
+			} elseif ( 'changelog' === $title ) {
+				$changelog .= $body . "\n\n";
+			} elseif ( ! in_array( $title, $utility_sections, true ) ) {
+				$description .= "\n\n## " . trim( $lines[0] ) . "\n" . $body;
+			}
+		}
+
+		return array(
+			'description'  => self::markdown_to_html( trim( $description ) ),
+			'installation' => self::markdown_to_html( trim( $installation ) ),
+			'faq'          => self::markdown_to_html( trim( $faq ) ),
+			'changelog'    => self::markdown_to_html( trim( $changelog ) ),
+		);
+	}
+
+	/**
+	 * Convert Markdown to HTML using Parsedown.
+	 *
+	 * Images are stripped before conversion since they are not useful
+	 * inside the WordPress plugin-information modal.
+	 *
+	 * @param string $markdown Markdown content.
+	 * @return string HTML content.
+	 */
+	private static function markdown_to_html( string $markdown ): string {
+		if ( '' === $markdown ) {
+			return '';
+		}
+
+		// Remove images (not useful in the modal).
+		$markdown = preg_replace( '/!\[[^\]]*\]\([^\)]+\)/', '', $markdown );
+
+		if ( ! class_exists( 'Parsedown' ) ) {
+			require_once __DIR__ . '/Parsedown.php';
+		}
+
+		$parsedown = new Parsedown();
+		$parsedown->setSafeMode( true );
+
+		$html = $parsedown->text( $markdown );
+
+		// Convert <table> to wp_kses-safe <div>/<span> structures.
+		$html = self::tables_to_divs( $html );
+
+		return $html;
+	}
+
+	/**
+	 * Convert HTML tables to div/span structures compatible with wp_kses.
+	 *
+	 * @param string $html HTML containing <table> elements.
+	 * @return string HTML with tables replaced by styled div/span.
+	 */
+	private static function tables_to_divs( string $html ): string {
+		return preg_replace_callback( '/<table>(.*?)<\/table>/s', function ( $m ) {
+			$table_html = $m[1];
+			$output     = '<div class="md-table">';
+
+			preg_match_all( '/<tr>(.*?)<\/tr>/s', $table_html, $rows );
+
+			foreach ( $rows[1] as $idx => $row_content ) {
+				$is_header = ( 0 === $idx && strpos( $table_html, '<thead>' ) !== false );
+				$row_class = $is_header ? 'md-tr md-th' : 'md-tr';
+
+				preg_match_all( '/<t[hd]>(.*?)<\/t[hd]>/s', $row_content, $cells );
+
+				$output .= '<div class="' . $row_class . '">';
+				foreach ( $cells[1] as $cell ) {
+					$output .= '<span>' . $cell . '</span>';
+				}
+				$output .= '</div>';
+			}
+
+			$output .= '</div>';
+			return $output;
+		}, $html );
 	}
 
 	/**
