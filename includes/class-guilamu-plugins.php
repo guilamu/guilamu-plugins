@@ -58,10 +58,13 @@ class Guilamu_Plugins {
 		wp_enqueue_script(
 			'guilamu-plugins-admin',
 			GUILAMU_PLUGINS_URL . 'assets/js/admin.js',
-			array( 'jquery' ),
+			array( 'jquery', 'plugin-install' ),
 			GUILAMU_PLUGINS_VERSION,
 			true
 		);
+
+		wp_enqueue_script( 'plugin-install' );
+		add_thickbox();
 
 			wp_localize_script(
 			'guilamu-plugins-admin',
@@ -70,6 +73,7 @@ class Guilamu_Plugins {
 				'ajaxUrl'            => admin_url( 'admin-ajax.php' ),
 				'nonce'              => wp_create_nonce( 'guilamu_plugins_nonce' ),
 				'bugReporterActive'  => $this->is_bug_reporter_active(),
+				'pluginInfoBaseUrl'  => self_admin_url( 'plugin-install.php?tab=plugin-information&plugin=' ),
 			)
 		);
 	}
@@ -182,6 +186,7 @@ class Guilamu_Plugins {
 		?>
 		<div class="guilamu-plugin-card"
 			 data-slug="<?php echo esc_attr( $plugin['slug'] ); ?>"
+			 data-details-slug="<?php echo esc_attr( $plugin['details_slug'] ); ?>"
 			 data-name="<?php echo esc_attr( $plugin['name'] ); ?>"
 			 data-description="<?php echo esc_attr( $plugin['description'] ); ?>"
 			 data-category="<?php echo esc_attr( $plugin['category'] ); ?>"
@@ -258,11 +263,17 @@ class Guilamu_Plugins {
 							<span class="guilamu-toggle-thumb"></span>
 						</button>
 					</div>
-				<?php endif; ?>
-			</div>
-
+					<a href="<?php echo esc_url( self_admin_url( 'plugin-install.php?tab=plugin-information&plugin=' . rawurlencode( $plugin['details_slug'] ) . '&TB_iframe=true&width=772&height=926' ) ); ?>"
+					   class="guilamu-view-details thickbox open-plugin-details-modal"
+				   aria-label="<?php echo esc_attr( sprintf( __( 'More information about %s', 'guilamu-plugins' ), $plugin['name'] ) ); ?>"
+				   data-title="<?php echo esc_attr( $plugin['name'] ); ?>">
+					<?php esc_html_e( 'View details', 'guilamu-plugins' ); ?> <span class="guilamu-chevron" aria-hidden="true">&rsaquo;</span>
+				</a>
+			<?php endif; ?>
 		</div>
-		<?php
+
+	</div>
+	<?php
 	}
 
 	/* ─────────────────────────────────────────────
@@ -344,10 +355,11 @@ class Guilamu_Plugins {
 		$plugin_data = reset( $plugin_files );
 
 		wp_send_json_success( array(
-			'plugin_file' => $main_file,
-			'name'        => $plugin_data['Name'],
-			'description' => $plugin_data['Description'],
-			'version'     => $plugin_data['Version'],
+			'plugin_file'  => $main_file,
+			'details_slug' => $this->get_plugin_details_slug( $plugin_data, $main_file, $slug ),
+			'name'         => $plugin_data['Name'],
+			'description'  => $plugin_data['Description'],
+			'version'      => $plugin_data['Version'],
 		) );
 	}
 
@@ -502,6 +514,7 @@ class Guilamu_Plugins {
 
 			$plugin = array(
 				'slug'         => $slug,
+				'details_slug' => sanitize_title( $slug ),
 				'name'         => $this->format_name( $slug ),
 				'description'  => ! empty( $repo['description'] ) ? $repo['description'] : '',
 				'github_url'   => 'https://github.com/guilamu/' . $slug,
@@ -514,6 +527,7 @@ class Guilamu_Plugins {
 
 			if ( $installed ) {
 				$plugin['is_installed'] = true;
+				$plugin['details_slug'] = $this->get_plugin_details_slug( $installed['data'], $installed['file'], $slug );
 				$plugin['plugin_file']  = $installed['file'];
 				$plugin['is_active']    = is_plugin_active( $installed['file'] );
 				$plugin['version']      = $installed['data']['Version'];
@@ -535,6 +549,33 @@ class Guilamu_Plugins {
 		} );
 
 		return $plugins;
+	}
+
+	/**
+	 * Resolve the slug used by the plugin details modal.
+	 *
+	 * Some Guilamu repos use a GitHub repo name with uppercase letters while the
+	 * plugin info modal expects the plugin's canonical lowercase slug.
+	 *
+	 * @param array  $plugin_data   Plugin header data from get_plugins().
+	 * @param string $plugin_file   Plugin file path relative to plugins dir.
+	 * @param string $fallback_slug GitHub repository slug.
+	 * @return string
+	 */
+	private function get_plugin_details_slug( array $plugin_data, $plugin_file = '', $fallback_slug = '' ) {
+		if ( ! empty( $plugin_data['TextDomain'] ) && 'default' !== $plugin_data['TextDomain'] ) {
+			return sanitize_title( $plugin_data['TextDomain'] );
+		}
+
+		if ( ! empty( $plugin_file ) ) {
+			$directory = dirname( $plugin_file );
+
+			if ( '.' !== $directory && '' !== $directory ) {
+				return sanitize_title( wp_basename( $directory ) );
+			}
+		}
+
+		return sanitize_title( $fallback_slug );
 	}
 
 	/**

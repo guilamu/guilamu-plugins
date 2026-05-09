@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Guilamu's WordPress Plugins 1.0.2\n"
+"Project-Id-Version: Guilamu's WordPress Plugins 1.0.3\n"
 "Report-Msgid-Bugs-To: https://github.com/guilamu/guilamu-plugins/issues\n"
-"POT-Creation-Date: 2026-03-05T00:00:00+00:00\n"
-"PO-Revision-Date: 2026-03-31 10:03+0200\n"
+"POT-Creation-Date: 2026-05-09T00:00:00+00:00\n"
+"PO-Revision-Date: 2026-05-09 14:11+0200\n"
 "Last-Translator: Guilamu <guilamu@github.com>\n"
 "Language-Team: French <fr@li.org>\n"
 "Language: fr_FR\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 3.8\n"
+"X-Generator: Poedit 3.9\n"
 "X-Domain: guilamu-plugins\n"
 
 #. Plugin Name of the plugin

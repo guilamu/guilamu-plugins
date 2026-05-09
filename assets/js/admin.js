@@ -65,6 +65,7 @@
 			if (response.success) {
 				var d = response.data;
 				$card.attr('data-status', 'installed').attr('data-plugin-file', d.plugin_file);
+				$card.attr('data-details-slug', d.details_slug || slug.toLowerCase());
 				if (d.name) {
 					$card.find('.guilamu-card-title').text(d.name);
 					$card.attr('data-name', d.name);
@@ -197,11 +198,15 @@
 			return;
 		}
 
+		var slug        = $card.data('slug');
+		var detailsSlug = $card.attr('data-details-slug') || slug;
+		var name        = $card.attr('data-name');
 		var statusClass = isActive ? 'guilamu-status--active' : 'guilamu-status--inactive';
 		var statusText  = isActive ? 'Active' : 'Inactive';
 		var toggleClass = isActive ? 'guilamu-toggle active' : 'guilamu-toggle';
 		var ariaChecked = isActive ? 'true' : 'false';
 		var ariaLabel   = isActive ? 'Deactivate' : 'Activate';
+		var detailsUrl  = guilamuPlugins.pluginInfoBaseUrl + encodeURIComponent(detailsSlug) + '&TB_iframe=true&width=772&height=926';
 
 		$footer.html(
 			'<div class="guilamu-toggle-wrap">' +
@@ -209,8 +214,18 @@
 				'<button class="' + toggleClass + '" role="switch" aria-checked="' + ariaChecked + '" aria-label="' + ariaLabel + '">' +
 					'<span class="guilamu-toggle-thumb"></span>' +
 				'</button>' +
-			'</div>'
+			'</div>' +
+			'<a href="' + escapeHtml(detailsUrl) + '"' +
+		' class="guilamu-view-details thickbox open-plugin-details-modal"' +
+			' aria-label="More information about ' + escapeHtml(name) + '"' +
+			' data-title="' + escapeHtml(name) + '">' +
+			'View details <span class="guilamu-chevron" aria-hidden="true">\u203a</span>' +
+			'</a>'
 		);
+
+		if (typeof tb_init === 'function') {
+			tb_init($footer.find('.guilamu-view-details'));
+		}
 	}
 
 	function updateFilterCounts() {
