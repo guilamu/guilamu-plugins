@@ -92,7 +92,7 @@ The dashboard falls back gracefully if the GitHub API is unreachable — already
 ## Changelog
 
 ### 1.0.3
-- Add the `View details` action into the plugin card footer
+- Added the `View details` action into the plugin card footer
 - Matched WordPress core plugin details modal behavior and close button handling
 
 ### 1.0.2
