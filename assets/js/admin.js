@@ -50,7 +50,10 @@
 
 	/* ── Install ── */
 
-	$(document).on('click', '.guilamu-install-btn', function () {
+	$(document).on('click', '.guilamu-install-btn', function (e) {
+		e.preventDefault();
+		e.stopPropagation();
+
 		var $btn  = $(this);
 		var $card = $btn.closest('.guilamu-plugin-card');
 		var slug  = $card.data('slug');
@@ -95,7 +98,10 @@
 
 	/* ── Toggle Activate / Deactivate ── */
 
-	$(document).on('click', '.guilamu-toggle', function () {
+	$(document).on('click', '.guilamu-toggle', function (e) {
+		e.preventDefault();
+		e.stopPropagation();
+
 		var $toggle = $(this);
 		if ($toggle.hasClass('loading')) return;
 
@@ -131,7 +137,10 @@
 
 	/* ── Delete ── */
 
-	$(document).on('click', '.guilamu-delete-btn', function () {
+	$(document).on('click', '.guilamu-delete-btn', function (e) {
+		e.preventDefault();
+		e.stopPropagation();
+
 		var $card      = $(this).closest('.guilamu-plugin-card');
 		var slug       = $card.data('slug');
 		var pluginFile = $card.attr('data-plugin-file');
@@ -193,7 +202,7 @@
 		if (status === 'not-installed') {
 			$footer.html(
 				'<span class="guilamu-status-label guilamu-status--not-installed">Not Installed</span>' +
-				'<button class="button button-primary guilamu-install-btn">Install</button>'
+				'<button type="button" class="button button-primary guilamu-install-btn">Install</button>'
 			);
 			return;
 		}
@@ -211,7 +220,7 @@
 		$footer.html(
 			'<div class="guilamu-toggle-wrap">' +
 				'<span class="guilamu-status-label ' + statusClass + '">' + statusText + '</span>' +
-				'<button class="' + toggleClass + '" role="switch" aria-checked="' + ariaChecked + '" aria-label="' + ariaLabel + '">' +
+				'<button type="button" class="' + toggleClass + '" role="switch" aria-checked="' + ariaChecked + '" aria-label="' + ariaLabel + '">' +
 					'<span class="guilamu-toggle-thumb"></span>' +
 				'</button>' +
 			'</div>' +
@@ -222,10 +231,6 @@
 			'View details <span class="guilamu-chevron" aria-hidden="true">\u203a</span>' +
 			'</a>'
 		);
-
-		if (typeof tb_init === 'function') {
-			tb_init($footer.find('.guilamu-view-details'));
-		}
 	}
 
 	function updateFilterCounts() {

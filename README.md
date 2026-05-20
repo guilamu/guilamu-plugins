@@ -91,8 +91,13 @@ The dashboard falls back gracefully if the GitHub API is unreachable — already
 
 ## Changelog
 
+### 1.0.4
+- Fixed the activation toggle after installing a plugin from the dashboard so it no longer opens a stuck Thickbox loader
+- Removed the incorrect Thickbox rebinding on dynamically rendered plugin cards
+- Added file-based cache busting for admin CSS and JS to avoid stale browser assets after updates
+
 ### 1.0.3
-- Added the `View details` action into the plugin card footer
+- Add the `View details` action into the plugin card footer
 - Matched WordPress core plugin details modal behavior and close button handling
 
 ### 1.0.2

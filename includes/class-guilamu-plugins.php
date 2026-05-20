@@ -46,11 +46,16 @@ class Guilamu_Plugins {
 			return;
 		}
 
+		$admin_css_path = GUILAMU_PLUGINS_DIR . 'assets/css/admin.css';
+		$admin_js_path  = GUILAMU_PLUGINS_DIR . 'assets/js/admin.js';
+		$admin_css_ver  = file_exists( $admin_css_path ) ? (string) filemtime( $admin_css_path ) : GUILAMU_PLUGINS_VERSION;
+		$admin_js_ver   = file_exists( $admin_js_path ) ? (string) filemtime( $admin_js_path ) : GUILAMU_PLUGINS_VERSION;
+
 		wp_enqueue_style(
 			'guilamu-plugins-admin',
 			GUILAMU_PLUGINS_URL . 'assets/css/admin.css',
 			array(),
-			GUILAMU_PLUGINS_VERSION
+			$admin_css_ver
 		);
 
 		wp_enqueue_style( 'dashicons' );
@@ -59,7 +64,7 @@ class Guilamu_Plugins {
 			'guilamu-plugins-admin',
 			GUILAMU_PLUGINS_URL . 'assets/js/admin.js',
 			array( 'jquery', 'plugin-install' ),
-			GUILAMU_PLUGINS_VERSION,
+			$admin_js_ver,
 			true
 		);
 
@@ -248,7 +253,7 @@ class Guilamu_Plugins {
 					<span class="guilamu-status-label guilamu-status--not-installed">
 						<?php esc_html_e( 'Not Installed', 'guilamu-plugins' ); ?>
 					</span>
-					<button class="button button-primary guilamu-install-btn">
+					<button type="button" class="button button-primary guilamu-install-btn">
 						<?php esc_html_e( 'Install', 'guilamu-plugins' ); ?>
 					</button>
 				<?php else : ?>
@@ -256,7 +261,7 @@ class Guilamu_Plugins {
 						<span class="guilamu-status-label <?php echo $plugin['is_active'] ? 'guilamu-status--active' : 'guilamu-status--inactive'; ?>">
 							<?php echo $plugin['is_active'] ? esc_html__( 'Active', 'guilamu-plugins' ) : esc_html__( 'Inactive', 'guilamu-plugins' ); ?>
 						</span>
-						<button class="guilamu-toggle <?php echo $plugin['is_active'] ? 'active' : ''; ?>"
+						<button type="button" class="guilamu-toggle <?php echo $plugin['is_active'] ? 'active' : ''; ?>"
 								role="switch"
 								aria-checked="<?php echo $plugin['is_active'] ? 'true' : 'false'; ?>"
 								aria-label="<?php echo $plugin['is_active'] ? esc_attr__( 'Deactivate', 'guilamu-plugins' ) : esc_attr__( 'Activate', 'guilamu-plugins' ); ?>">
