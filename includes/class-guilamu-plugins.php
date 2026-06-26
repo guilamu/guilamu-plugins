@@ -568,16 +568,19 @@ class Guilamu_Plugins {
 	 * @return string
 	 */
 	private function get_plugin_details_slug( array $plugin_data, $plugin_file = '', $fallback_slug = '' ) {
-		if ( ! empty( $plugin_data['TextDomain'] ) && 'default' !== $plugin_data['TextDomain'] ) {
-			return sanitize_title( $plugin_data['TextDomain'] );
-		}
-
+		// Prefer the directory name: it matches the slug that WordPress and
+		// GitHub updaters register with plugins_api (plugin_information).
+		// The text domain can differ (e.g. 'smm' vs 'simple-membership-manager').
 		if ( ! empty( $plugin_file ) ) {
 			$directory = dirname( $plugin_file );
 
 			if ( '.' !== $directory && '' !== $directory ) {
 				return sanitize_title( wp_basename( $directory ) );
 			}
+		}
+
+		if ( ! empty( $plugin_data['TextDomain'] ) && 'default' !== $plugin_data['TextDomain'] ) {
+			return sanitize_title( $plugin_data['TextDomain'] );
 		}
 
 		return sanitize_title( $fallback_slug );

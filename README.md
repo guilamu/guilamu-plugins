@@ -91,6 +91,9 @@ The dashboard falls back gracefully if the GitHub API is unreachable — already
 
 ## Changelog
 
+### 1.0.5
+- Fixed the "View details" modal link for plugins where the directory/slug name differs from the text domain (e.g. simple-membership-manager)
+
 ### 1.0.4
 - Fixed the activation toggle after installing a plugin from the dashboard so it no longer opens a stuck Thickbox loader
 - Removed the incorrect Thickbox rebinding on dynamically rendered plugin cards
