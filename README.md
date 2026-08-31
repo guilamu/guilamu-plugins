@@ -1,5 +1,7 @@
 # Guilamu's WordPress Plugins
 
+[![Latest Release](https://img.shields.io/github/v/release/guilamu/guilamu-plugins?color=blue)](https://github.com/guilamu/guilamu-plugins/releases) [![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-green.svg)](LICENSE) [![WordPress: 5.8+](https://img.shields.io/badge/WordPress-5.8%2B-blue.svg)](https://wordpress.org) [![PHP: 7.4+](https://img.shields.io/badge/PHP-7.4%2B-purple.svg)](https://php.net)
+
 Discover, install, and manage all of Guilamu's WordPress plugins directly from your WordPress admin dashboard.
 
 ## Plugin Dashboard
@@ -30,7 +32,6 @@ Discover, install, and manage all of Guilamu's WordPress plugins directly from y
 - **Multilingual:** Works with content in any language
 - **Translation-Ready:** All strings are internationalized; French (fr_FR) included
 - **Secure:** Nonce-verified AJAX, capability checks, and input sanitization on all actions
-- **Lightweight:** Pure PHP admin — no React, no build step required
 
 ## Requirements
 
@@ -49,7 +50,7 @@ Discover, install, and manage all of Guilamu's WordPress plugins directly from y
 
 ### How are plugins detected?
 
-Any public GitHub repository under the `guilamu` account that has the `wordpress-plugin` topic is automatically listed. Use the `Refresh` button to pick up newly published repos.
+Any public GitHub repository under the `guilamu` account carrying the `wordpress-plugin`, `wordpress` or `gravity-forms` topic is listed automatically, as is any Guilamu plugin already installed on the site. Use the `Refresh` button to pick up newly published repos.
 
 ### How do I categorize a plugin as a Gravity Forms plugin?
 
@@ -61,11 +62,11 @@ The plugin uses the `Update URI` header and the `update_plugins_github.com` Word
 
 ### Where can I report bugs?
 
-Install and activate [guilamu-bug-reporter](https://github.com/guilamu/guilamu-bug-reporter). A flag icon will appear on each installed plugin's card, opening the bug report modal directly.
+Install and activate [guilamu-bug-reporter](https://github.com/guilamu/guilamu-bug-reporter). A flag icon appears on each installed plugin's card, and a **Report a Bug** link appears in this plugin's own row on the Plugins page.
 
 ### Can I use this on a site without internet access?
 
-The dashboard falls back gracefully if the GitHub API is unreachable — already-installed plugins remain visible and manageable, but descriptions and new plugin discovery will be unavailable until connectivity is restored.
+Yes. The last successful GitHub response is stored as an offline fallback, and locally installed Guilamu plugins are always listed, so installed plugins stay visible and manageable. Only the discovery of newly published plugins requires connectivity.
 
 ## Project Structure
 
@@ -91,29 +92,39 @@ The dashboard falls back gracefully if the GitHub API is unreachable — already
 
 ## Changelog
 
-### 1.0.5
-- Fixed the "View details" modal link for plugins where the directory/slug name differs from the text domain (e.g. simple-membership-manager)
+### 1.0.6 - 2026-08-31
+- **New:** `gravity-forms` is now recognised as a WordPress plugin topic, so add-ons tagged only `gravity-forms` on GitHub are no longer missing from the list
+- **New:** Registered with Guilamu Bug Reporter, adding a "Report a Bug" link to the plugin's own row on the Plugins page
+- **New:** CSS pattern banner in the "View details" popup
+- **Improved:** The GitHub repository list is now kept as an offline fallback, so the dashboard stays populated when the API is unreachable or rate-limited
+- **Improved:** Locally installed Guilamu plugins absent from the GitHub response are now listed too
+- **Fixed:** "View details" popup could fail with "Plugin not found" when another plugin's `plugins_api` filter discarded the payload
+- **Fixed:** Empty popup footer when no GitHub release data was available
+- **Changed:** Plugin header now declares AGPL-3.0, matching the `LICENSE` file and this README
 
-### 1.0.4
-- Fixed the activation toggle after installing a plugin from the dashboard so it no longer opens a stuck Thickbox loader
-- Removed the incorrect Thickbox rebinding on dynamically rendered plugin cards
-- Added file-based cache busting for admin CSS and JS to avoid stale browser assets after updates
+### 1.0.5 - 2026-06-26
+- **Fixed:** "View details" modal link for plugins where the directory/slug name differs from the text domain (e.g. simple-membership-manager)
 
-### 1.0.3
-- Add the `View details` action into the plugin card footer
-- Matched WordPress core plugin details modal behavior and close button handling
+### 1.0.4 - 2026-05-20
+- **Fixed:** Activation toggle after installing a plugin from the dashboard no longer opens a stuck Thickbox loader
+- **Fixed:** Removed the incorrect Thickbox rebinding on dynamically rendered plugin cards
+- **Improved:** File-based cache busting for admin CSS and JS to avoid stale browser assets after updates
 
-### 1.0.2
-- Added "View details" thickbox link on the Plugins page
-- Rewritten GitHub updater: README.md-based plugin info popup with Description, Installation, FAQ, and Changelog tabs
-- Added Parsedown dependency for reliable Markdown-to-HTML conversion
-- CSS injection and div-based table rendering for wp_kses compatibility
-- Added required `id`, `slug`, `plugin` fields to update response for WP core compatibility
+### 1.0.3 - 2026-05-09
+- **New:** `View details` action in the plugin card footer
+- **Improved:** Matched WordPress core plugin details modal behavior and close button handling
 
-### 1.0.1
-- Removed hardcoded GF_SLUGS fallback list; plugin category badges now rely entirely on GitHub repository topics (`gravity-forms`, `wordpress-plugin`)
+### 1.0.2 - 2026-03-31
+- **New:** "View details" thickbox link on the Plugins page
+- **New:** Parsedown dependency for reliable Markdown-to-HTML conversion
+- **Improved:** Rewritten GitHub updater: README.md-based plugin info popup with Description, Installation, FAQ, and Changelog tabs
+- **Improved:** CSS injection and div-based table rendering for wp_kses compatibility
+- **Fixed:** Added required `id`, `slug`, `plugin` fields to the update response for WP core compatibility
 
-### 1.0.0
+### 1.0.1 - 2026-03-25
+- **Removed:** Hardcoded GF_SLUGS fallback list; plugin category badges now rely entirely on GitHub repository topics (`gravity-forms`, `wordpress-plugin`)
+
+### 1.0.0 - 2026-03-05
 - Initial release
 - Plugin dashboard with card grid, search, and dropdown filters
 - Install, activate, deactivate, and delete plugins via AJAX
@@ -122,12 +133,20 @@ The dashboard falls back gracefully if the GitHub API is unreachable — already
 - Per-card bug reporting integration with guilamu-bug-reporter
 - French (fr_FR) translation included
 
+## Security
+
+If you discover a security vulnerability in this plugin, please report it responsibly through [GitHub Security Advisories](https://github.com/guilamu/guilamu-plugins/security/advisories/new). Do not open a public issue for security reports.
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/guilamu/guilamu-plugins).
+
+For translations, the plugin uses WordPress i18n. You can contribute translations by editing the `.po` files in the `languages/` directory and generating the corresponding `.mo` files with the `wp i18n` CLI commands.
+
 ## License
 
 This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0) - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-<p align="center">
-  Made with love for the WordPress community
-</p>
+Made with love for the WordPress community
