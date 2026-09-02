@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Guilamu's WordPress Plugins 1.0.6\n"
+"Project-Id-Version: Guilamu's WordPress Plugins 1.0.5\n"
 "Report-Msgid-Bugs-To: https://github.com/guilamu/guilamu-plugins/issues\n"
-"POT-Creation-Date: 2026-08-31T00:00:00+00:00\n"
-"PO-Revision-Date: 2026-08-31 14:30+0200\n"
+"POT-Creation-Date: 2026-05-09T00:00:00+00:00\n"
+"PO-Revision-Date: 2026-05-09 14:11+0200\n"
 "Last-Translator: Guilamu <guilamu@github.com>\n"
 "Language-Team: French <fr@li.org>\n"
 "Language: fr_FR\n"
@@ -44,8 +44,8 @@ msgid "Refresh"
 msgstr "Actualiser"
 
 #: includes/class-guilamu-plugins.php
-msgid "Could not reach the GitHub API. The list below may be out of date and newly published plugins may be missing; installed plugins remain manageable. Click \"Refresh\" to retry."
-msgstr "Impossible de joindre l'API GitHub. La liste ci-dessous peut être obsolète et les plugins récemment publiés peuvent manquer ; les plugins installés restent gérables. Cliquez sur « Actualiser » pour réessayer."
+msgid "Could not fetch plugin data from GitHub. Descriptions may be unavailable. Click \"Refresh\" to retry."
+msgstr "Impossible de récupérer les données depuis GitHub. Les descriptions peuvent être indisponibles. Cliquez sur « Actualiser » pour réessayer."
 
 #: includes/class-guilamu-plugins.php
 msgid "Gravity Forms is not installed or activated. Gravity Forms plugins require it to function."
@@ -158,23 +158,3 @@ msgstr "Plus d'informations sur les extensions WordPress de Guilamu"
 #: guilamu-plugins.php
 msgid "View details"
 msgstr "Voir les détails"
-
-#: guilamu-plugins.php
-msgid "🐛 Report a Bug"
-msgstr "🐛 Signaler un bug"
-
-#: guilamu-plugins.php
-msgid "🐛 Report a Bug (install Bug Reporter)"
-msgstr "🐛 Signaler un bug (installer Bug Reporter)"
-
-#: includes/class-guilamu-plugins.php
-msgid "Guilamu's Plugins"
-msgstr "Extensions de Guilamu"
-
-#: includes/class-guilamu-plugins.php
-msgid "More information about %s"
-msgstr "En savoir plus sur %s"
-
-#: includes/class-guilamu-plugins.php
-msgid "No downloadable package found for this plugin."
-msgstr "Aucun paquet téléchargeable n'a été trouvé pour cette extension."

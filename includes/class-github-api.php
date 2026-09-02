@@ -7,23 +7,14 @@ class Guilamu_GitHub_API {
 
 	const API_URL        = 'https://api.github.com/users/guilamu/repos';
 	const CACHE_KEY      = 'guilamu_github_repos';
-	const BACKUP_KEY     = 'guilamu_github_repos_backup';
 	const CACHE_DURATION = 43200; // 12 hours.
-
-	/** @var bool Whether the last get_repos() call served stale backup data. */
-	private $stale = false;
 
 	/**
 	 * Get repos from cache or fetch from GitHub.
 	 *
-	 * On a failed fetch the last successful response is served instead, so the
-	 * dashboard keeps working when GitHub is unreachable or rate-limited.
-	 *
 	 * @return array Associative array keyed by repo name.
 	 */
 	public function get_repos() {
-		$this->stale = false;
-
 		$cached = get_transient( self::CACHE_KEY );
 		if ( false !== $cached ) {
 			return $cached;
@@ -32,27 +23,9 @@ class Guilamu_GitHub_API {
 		$repos = $this->fetch_repos();
 		if ( ! empty( $repos ) ) {
 			set_transient( self::CACHE_KEY, $repos, self::CACHE_DURATION );
-			update_option( self::BACKUP_KEY, $repos, false );
-			return $repos;
 		}
 
-		// Fetch failed: fall back to the last known good response.
-		$backup = get_option( self::BACKUP_KEY, array() );
-		if ( is_array( $backup ) && ! empty( $backup ) ) {
-			$this->stale = true;
-			return $backup;
-		}
-
-		return array();
-	}
-
-	/**
-	 * Whether the data returned by the last get_repos() call is stale backup data.
-	 *
-	 * @return bool
-	 */
-	public function is_stale() {
-		return $this->stale;
+		return $repos;
 	}
 
 	/**

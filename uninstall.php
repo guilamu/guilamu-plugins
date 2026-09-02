@@ -15,6 +15,3 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 // Delete GitHub API / updater transients.
 delete_transient( 'guilamu_github_repos' );
 delete_transient( 'guilamu_plugins_github_release' );
-
-// Delete the offline fallback copy of the GitHub repo list.
-delete_option( 'guilamu_github_repos_backup' );
