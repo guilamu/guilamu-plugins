@@ -127,7 +127,7 @@ class Guilamu_Plugins {
 				<div class="notice notice-info inline">
 					<p>
 						<span class="dashicons dashicons-info"></span>
-						<?php esc_html_e( 'Could not fetch plugin data from GitHub. Descriptions may be unavailable. Click "Refresh" to retry.', 'guilamu-plugins' ); ?>
+						<?php esc_html_e( 'Could not reach the GitHub API. The list below may be out of date and newly published plugins may be missing; installed plugins remain manageable. Click "Refresh" to retry.', 'guilamu-plugins' ); ?>
 					</p>
 				</div>
 			<?php endif; ?>
@@ -485,7 +485,7 @@ class Guilamu_Plugins {
 		$api          = new Guilamu_GitHub_API();
 		$github_repos = $api->get_repos();
 
-		$this->api_available = ! empty( $github_repos );
+		$this->api_available = ! empty( $github_repos ) && ! $api->is_stale();
 
 		if ( ! function_exists( 'get_plugins' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
@@ -493,6 +493,7 @@ class Guilamu_Plugins {
 
 		$installed_plugins = get_plugins();
 		$plugins           = array();
+		$matched_files     = array();
 
 		// Skip repos that are clearly not WP plugins (this plugin itself, docs, etc.).
 		$skip = array( 'guilamu-plugins', 'guilamu', '.github' );
@@ -504,11 +505,12 @@ class Guilamu_Plugins {
 			}
 
 			// Auto-detect if this is a WP plugin:
-			// 1. Has 'wordpress-plugin' topic, OR
+			// 1. Has one of the recognised plugin topics, OR
 			// 2. Is already installed locally as a WP plugin.
-			$topics       = isset( $repo['topics'] ) ? $repo['topics'] : array();
-			$has_wp_topic = in_array( 'wordpress-plugin', $topics, true ) || in_array( 'wordpress', $topics, true );
-			$installed    = $this->find_installed_plugin( $slug, $installed_plugins );
+			$plugin_topics = array( 'wordpress-plugin', 'wordpress', 'gravity-forms' );
+			$topics        = isset( $repo['topics'] ) ? $repo['topics'] : array();
+			$has_wp_topic  = (bool) array_intersect( $plugin_topics, $topics );
+			$installed     = $this->find_installed_plugin( $slug, $installed_plugins );
 
 			if ( ! $has_wp_topic && ! $installed ) {
 				continue;
@@ -546,6 +548,37 @@ class Guilamu_Plugins {
 			}
 
 			$plugins[ $slug ] = $plugin;
+
+			if ( $installed ) {
+				$matched_files[ $installed['file'] ] = true;
+			}
+		}
+
+		// Any Guilamu plugin installed locally but absent from the GitHub
+		// response still belongs in the list — this keeps the dashboard usable
+		// when the API is unreachable and no backup has been stored yet.
+		foreach ( $installed_plugins as $file => $data ) {
+			if ( isset( $matched_files[ $file ] ) || ! $this->is_guilamu_plugin( $data ) ) {
+				continue;
+			}
+
+			$slug = dirname( $file );
+			if ( '.' === $slug || isset( $plugins[ $slug ] ) || in_array( $slug, $skip, true ) ) {
+				continue;
+			}
+
+			$plugins[ $slug ] = array(
+				'slug'         => $slug,
+				'details_slug' => $this->get_plugin_details_slug( $data, $file, $slug ),
+				'name'         => ! empty( $data['Name'] ) ? $data['Name'] : $this->format_name( $slug ),
+				'description'  => ! empty( $data['Description'] ) ? $data['Description'] : '',
+				'github_url'   => 'https://github.com/guilamu/' . $slug,
+				'category'     => $this->guess_category( $slug, $data ),
+				'is_installed' => true,
+				'is_active'    => is_plugin_active( $file ),
+				'plugin_file'  => $file,
+				'version'      => $data['Version'],
+			);
 		}
 
 		// Sort alphabetically by display name.
@@ -584,6 +617,43 @@ class Guilamu_Plugins {
 		}
 
 		return sanitize_title( $fallback_slug );
+	}
+
+	/**
+	 * Check whether an installed plugin is authored by Guilamu.
+	 *
+	 * @param array $plugin_data Plugin header data from get_plugins().
+	 * @return bool
+	 */
+	private function is_guilamu_plugin( array $plugin_data ) {
+		if ( ! empty( $plugin_data['Author'] ) && false !== stripos( wp_strip_all_tags( $plugin_data['Author'] ), 'guilamu' ) ) {
+			return true;
+		}
+
+		foreach ( array( 'PluginURI', 'AuthorURI' ) as $key ) {
+			if ( ! empty( $plugin_data[ $key ] ) && false !== stripos( $plugin_data[ $key ], 'github.com/guilamu' ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Guess a plugin category without GitHub topics.
+	 *
+	 * Only used for locally installed plugins missing from the GitHub response.
+	 *
+	 * @param string $slug        Plugin folder name.
+	 * @param array  $plugin_data Plugin header data from get_plugins().
+	 * @return string 'gravity-forms' or 'non-gravity-forms'.
+	 */
+	private function guess_category( $slug, array $plugin_data ) {
+		$haystack = $slug . ' ' . ( isset( $plugin_data['Name'] ) ? $plugin_data['Name'] : '' );
+
+		return preg_match( '/(^|[^a-z])gf([^a-z]|$)|gravity/i', $haystack )
+			? 'gravity-forms'
+			: 'non-gravity-forms';
 	}
 
 	/**

@@ -44,9 +44,6 @@ class Guilamu_Plugins_GitHub_Updater {
 	/** @var string Minimum WordPress version. */
 	private const REQUIRES_WP = '5.8';
 
-	/** @var string Tested up to WordPress version. */
-	private const TESTED_WP = '7.1';
-
 	/** @var string Minimum PHP version. */
 	private const REQUIRES_PHP = '7.4';
 
@@ -84,6 +81,7 @@ class Guilamu_Plugins_GitHub_Updater {
 	public static function init(): void {
 		add_filter( 'update_plugins_github.com', array( self::class, 'check_for_update' ), 10, 4 );
 		add_filter( 'plugins_api', array( self::class, 'plugin_info' ), 20, 3 );
+		add_filter( 'plugins_api_result', array( self::class, 'finalize_plugin_info' ), PHP_INT_MAX, 3 );
 		add_filter( 'upgrader_source_selection', array( self::class, 'fix_folder_name' ), 10, 4 );
 		add_action( 'admin_head', array( self::class, 'plugin_info_css' ) );
 	}
@@ -176,7 +174,25 @@ class Guilamu_Plugins_GitHub_Updater {
 			}
 		}
 
-		return $release_data['zipball_url'] ?? '';
+		return $release_data['zipball_url'] ?? self::get_fallback_package_url();
+	}
+
+	/**
+	 * Package URL used when no release data is available.
+	 *
+	 * WordPress only renders the popup footer action button when
+	 * $res->download_link is non-empty, so it must never be blank — even when
+	 * GitHub is unreachable or rate-limited.
+	 *
+	 * @return string Download URL.
+	 */
+	private static function get_fallback_package_url(): string {
+		return sprintf(
+			'https://github.com/%s/%s/releases/latest/download/%s.zip',
+			self::GITHUB_USER,
+			self::GITHUB_REPO,
+			self::PLUGIN_SLUG
+		);
 	}
 
 	/**
@@ -212,7 +228,7 @@ class Guilamu_Plugins_GitHub_Updater {
 			'version'       => $new_version,
 			'package'       => self::get_package_url( $release ),
 			'url'           => $release['html_url'],
-			'tested'        => self::TESTED_WP,
+			'tested'        => get_bloginfo( 'version' ),
 			'requires_php'  => self::REQUIRES_PHP,
 			'compatibility' => new stdClass(),
 			'icons'         => array(),
@@ -240,6 +256,44 @@ class Guilamu_Plugins_GitHub_Updater {
 			return $res;
 		}
 
+		return self::build_plugin_info_result();
+	}
+
+	/**
+	 * Guarantee that core receives a valid object for our slug.
+	 *
+	 * Another plugin's `plugins_api` filter can return false for our slug after
+	 * we built the payload, which makes WordPress query wordpress.org and fail
+	 * with "Plugin not found" (HTTP 500). Running last, this rebuilds the
+	 * object whenever the result is no longer ours.
+	 *
+	 * @param false|object|array $res    Existing result.
+	 * @param string             $action API action.
+	 * @param object             $args   API arguments.
+	 * @return object Plugin info object.
+	 */
+	public static function finalize_plugin_info( $res, $action, $args ) {
+		if ( 'plugin_information' !== $action ) {
+			return $res;
+		}
+
+		if ( ! isset( $args->slug ) || self::PLUGIN_SLUG !== $args->slug ) {
+			return $res;
+		}
+
+		if ( $res instanceof stdClass && isset( $res->slug ) && self::PLUGIN_SLUG === $res->slug ) {
+			return $res;
+		}
+
+		return self::build_plugin_info_result();
+	}
+
+	/**
+	 * Build the plugin information payload for the "View details" popup.
+	 *
+	 * @return stdClass
+	 */
+	private static function build_plugin_info_result(): stdClass {
 		$plugin_file = WP_PLUGIN_DIR . '/' . self::PLUGIN_FILE;
 		$plugin_data = get_plugin_data( $plugin_file, false, false );
 		$release     = self::get_release_data();
@@ -252,20 +306,21 @@ class Guilamu_Plugins_GitHub_Updater {
 		$res->name         = self::PLUGIN_NAME;
 		$res->slug         = self::PLUGIN_SLUG;
 		$res->plugin       = self::PLUGIN_FILE;
-		// Marks the plugin as not hosted on WordPress.org, otherwise
-		// install_plugin_information() prints a "WordPress.org Plugin Page" link
-		// built from the slug — a 404 for a GitHub-only plugin.
-		$res->external     = true;
 		$res->version      = $version;
 		$res->author       = sprintf( '<a href="https://github.com/%s">%s</a>', self::GITHUB_USER, self::GITHUB_USER );
 		$res->homepage     = sprintf( 'https://github.com/%s/%s', self::GITHUB_USER, self::GITHUB_REPO );
 		$res->requires     = self::REQUIRES_WP;
-		$res->tested       = self::TESTED_WP;
+		$res->tested       = get_bloginfo( 'version' );
 		$res->requires_php = self::REQUIRES_PHP;
 
+		// Must stay non-empty even when up to date or offline, otherwise
+		// WordPress renders no footer action button at all.
+		$res->download_link = $release
+			? self::get_package_url( $release )
+			: self::get_fallback_package_url();
+
 		if ( $release ) {
-			$res->download_link = self::get_package_url( $release );
-			$res->last_updated  = $release['published_at'] ?? '';
+			$res->last_updated = $release['published_at'] ?? '';
 		}
 
 		// Build sections from local README.md.
@@ -311,7 +366,22 @@ class Guilamu_Plugins_GitHub_Updater {
 			return;
 		}
 
+		// WordPress only adds .with-banner when $api->banners holds real image
+		// URLs. Without a hosted image we paint a pure-CSS pattern instead and
+		// add the class ourselves; !important is required to beat core's
+		// `background-image: none`.
 		echo '<style>'
+			. '#plugin-information-title.with-banner {'
+			. '  --c1: #1d2327; --c2: #2271b1; --c3: #72aee6; --s: 27px;'
+			. '  background:'
+			. '    conic-gradient(from 90deg at 2px 2px, transparent 25%, var(--c1) 0)'
+			. '      0 0 / var(--s) var(--s),'
+			. '    repeating-linear-gradient(45deg, var(--c2) 0 12.5%, var(--c3) 0 25%)'
+			. '      !important;'
+			. '  background-size: var(--s) var(--s), calc(var(--s) * 4) calc(var(--s) * 4) !important;'
+			. '  height: 250px;'
+			. '}'
+			. '#plugin-information-title.with-banner h2 { margin-top: 174px; }'
 			. '#section-holder .section h2 { margin: 1.5em 0 0.5em; clear: none; }'
 			. '#section-holder .section h3 { margin: 1.5em 0 0.5em; }'
 			. '#section-holder .section > :first-child { margin-top: 0; }'
@@ -320,6 +390,13 @@ class Guilamu_Plugins_GitHub_Updater {
 			. '.md-tr > span { display: table-cell; padding: 6px 10px; border: 1px solid #ddd; vertical-align: top; }'
 			. '.md-th > span { font-weight: 600; background: #f5f5f5; }'
 			. '</style>';
+
+		echo '<script>'
+			. 'document.addEventListener("DOMContentLoaded", function () {'
+			. '  var t = document.getElementById("plugin-information-title");'
+			. '  if (t) { t.classList.add("with-banner"); }'
+			. '});'
+			. '</script>';
 	}
 
 	// ------------------------------------------------------------------
